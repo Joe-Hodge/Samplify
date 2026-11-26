@@ -1,6 +1,6 @@
 # From Spotify to a four-bar mix
 
-[![Play the Samplify feature film](poster.jpg)](samplify.mp4)
+https://github.com/user-attachments/assets/a41b334f-4351-4ec1-ac8f-59ce581f6cb5
 
 The 46-second film uses OpenScreen recordings of Spotify desktop, Samplify on Windows and the exported WAV open in Audacity. The capture card and Playground show a real session. The music heard throughout is a separately mixed, licensed score.
 

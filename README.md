@@ -2,9 +2,9 @@
 
 Capture a phrase while Spotify is playing, trim it on a waveform and use it to make something of your own. Samplify keeps a local sample library and gives you eight lanes in Playground to arrange captures, stems and recordings from disk.
 
-[![Watch the 46-second Samplify demo. A Spotify capture and a drum recording sit on two Playground lanes.](docs/demo/poster.jpg)](docs/demo/samplify.mp4)
+https://github.com/user-attachments/assets/a41b334f-4351-4ec1-ac8f-59ce581f6cb5
 
-**[Watch the feature film](docs/demo/samplify.mp4)** · **[Download for Windows](https://github.com/Joe-Hodge/Samplify/releases/latest)** · [Music and film credits](docs/demo/README.md) · [Platform and test status](docs/STATUS.md)
+**[Download for Windows](https://github.com/Joe-Hodge/Samplify/releases/latest)** · [Music and film credits](docs/demo/README.md) · [Platform and test status](docs/STATUS.md)
 
 ## Why it exists
 
