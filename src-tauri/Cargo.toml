@@ -1,0 +1,74 @@
+[package]
+name = "samplify"
+version = "1.0.1"
+description = "Timestamped notes + audio capture from Spotify, for sampling"
+authors = ["Joe Hodge"]
+license = "MIT"
+repository = "https://github.com/Joe-Hodge/Samplify"
+edition = "2021"
+default-run = "samplify"
+
+[lib]
+name = "samplify_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2.0.0", features = ["tray-icon", "image-png", "protocol-asset"] }
+tauri-plugin-global-shortcut = "2.0.0"
+tauri-plugin-notification = "2.0.0"
+tauri-plugin-single-instance = "2.4.1"
+tauri-plugin-drag = "2"
+tokio-tungstenite = "0.24"
+futures-util = "0.3"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.36", features = ["full"] }
+reqwest = { version = "0.12", features = ["json"] }
+rusqlite = { version = "0.33", features = ["bundled"] }
+hound = "3.5.1"
+chrono = "0.4.35"
+anyhow = "1.0"
+dirs = "5.0"
+log = "0.4"
+fern = "0.7"
+uuid = { version = "1.23.0", features = ["v4"] }
+sha2 = "0.10"
+base64 = "0.22.0"
+fs2 = "0.4"
+rand = "0.8"
+rubato = "0.16"
+ort = "2.0.0-rc.12"
+ndarray = "0.17"
+
+# Platform-specific audio-capture backends. Exactly one is active per build;
+# both feed the shared `RingBuffer` in `capture.rs` interleaved f32 samples.
+# Gate behind target-specific dependencies so Windows `cargo test` runs
+# don't pull in the macOS toolchain.
+[target.'cfg(target_os = "windows")'.dependencies]
+# Thin bindings to Windows application loopback and process enumeration.
+wasapi = "0.27"
+windows-sys = { version = "0.61", features = ["Win32_System_Diagnostics_ToolHelp", "Win32_System_Performance", "Win32_System_RemoteDesktop"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+# screencapturekit 8: thin Swift-bridge FFI over Apple's ScreenCaptureKit
+# framework, audio-only SCStream supported via the `macos_14_0` feature
+# (Sonoma is our minimum supported macOS). Same dependency category as wasapi
+# (Windows audio FFI) and hound (audio file IO) — link-time binding only,
+# no runtime/GPU/ML model, no heavy framework. Clears the "no heavy deps"
+# hard rule the same way those did.
+screencapturekit = { version = "8", features = ["macos_14_0"] }
+
+[dev-dependencies]
+tempfile = "3.27.0"
+
+[profile.dev]
+opt-level = 1
+[profile.dev.package."*"]
+opt-level = 3
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3

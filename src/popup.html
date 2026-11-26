@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/popup.css" />
+  <title>Capture</title>
+</head>
+<body>
+  <div class="card">
+    <!-- Header -->
+    <div class="head">
+      <img id="art" class="art" alt="" src="" />
+      <div class="meta">
+        <span id="title" class="title">—</span>
+        <span id="artist" class="artist">—</span>
+      </div>
+      <div class="time-badge" title="Playback position when captured">
+        <span id="time" class="time">0:00</span>
+      </div>
+      <button id="close-btn" class="close-btn" title="Discard (Esc)"><i data-icon="close" data-size="14"></i></button>
+    </div>
+
+    <!-- Waveform editor -->
+    <div class="wave-toolbar">
+      <div class="sel-readout">
+        <label>In</label>
+        <input id="in-time" class="time-input" value="0:00.0" spellcheck="false" />
+        <label>Out</label>
+        <input id="out-time" class="time-input" value="0:00.0" spellcheck="false" />
+        <span id="sel-dur" class="sel-dur">0.0s</span>
+      </div>
+      <div class="wave-tools">
+        <button id="loop-btn" class="tool-btn" title="Loop audition (L)"><i data-icon="loop" data-size="12"></i> Loop</button>
+        <button id="zoom-sel-btn" class="tool-btn" title="Zoom to selection"><i data-icon="fit" data-size="12"></i> Zoom</button>
+        <button id="fit-btn" class="tool-btn" title="Fit whole buffer"><i data-icon="fit" data-size="12"></i> Fit</button>
+        <span class="tempo-control" title="Audition speed (pitch preserved). Double-click to reset.">
+          <span class="tempo-icon"><i data-icon="speed" data-size="12"></i></span>
+          <input id="tempo-slider" type="range" min="50" max="150" value="100" class="tempo-slider" />
+          <span id="tempo-val" class="tempo-val">1.00×</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="canvas-wrapper">
+      <canvas id="waveform-canvas"></canvas>
+      <canvas id="ruler-canvas" class="ruler"></canvas>
+    </div>
+
+    <!-- Controls -->
+    <div class="control-row">
+      <button id="audition-btn" class="audition-btn" title="Play selection (Space)"><i data-icon="play" data-size="13"></i> Play</button>
+      <input id="note" class="note" placeholder="what's the idea? (Enter to save · Esc to discard)" autocomplete="off" />
+      <button id="save-btn" class="save-btn">Save</button>
+    </div>
+
+    <div id="tags" class="tags"></div>
+
+    <div class="hint-row">
+      <span class="hint">drag edges to trim · drag middle to move · click empty to redraw · wheel to zoom</span>
+      <span class="hint">←/→ nudge out · Alt+←/→ nudge in · [ / ] set to playhead</span>
+    </div>
+  </div>
+
+  <audio id="audition-audio"></audio>
+  <script type="module" src="js/popup.js"></script>
+</body>
+</html>

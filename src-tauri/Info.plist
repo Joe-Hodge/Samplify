@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!--
+    macOS terminates any app that fires the Screen Recording TCC prompt
+    without a usage string. Samplify captures system audio (the music
+    playing in Spotify) — no screen video is captured — but macOS bundles
+    audio capture under the Screen Recording permission. Tauri auto-merges
+    this sibling Info.plist into the bundled app's default Info.plist.
+  -->
+  <key>NSScreenCaptureUsageDescription</key>
+  <string>Samplify captures system audio (the music playing in Spotify) for your sample library. No video of your screen is captured — the permission is required by macOS to grant audio-capture access. Samplify is a single-user local app and never transmits audio off your machine.</string>
+</dict>
+</plist>

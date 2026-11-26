@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/library.css" />
+  <title>Samplify</title>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Left Nav Rail -->
+    <aside class="nav-rail">
+      <div class="logo-row">
+        <span class="logo-icon">◆</span>
+        <span class="logo-text">Samplify</span>
+      </div>
+      <nav class="nav-menu">
+        <a href="#" class="nav-item active" data-view="library">
+          <i data-icon="library" data-size="17" class="nav-item-icon"></i> Library
+        </a>
+        <a href="#" class="nav-item" data-view="collections">
+          <i data-icon="folder" data-size="17" class="nav-item-icon"></i> Collections
+        </a>
+        <a href="#" class="nav-item" data-view="tags">
+          <i data-icon="tag" data-size="17" class="nav-item-icon"></i> Tags
+        </a>
+        <a href="#" class="nav-item" data-view="playground">
+          <i data-icon="sliders" data-size="17" class="nav-item-icon"></i> Playground <span id="playground-badge" class="count-badge" style="display:none">0</span>
+        </a>
+      </nav>
+      <!-- Bottom-Left Visualizer Card -->
+      <div id="visualizer-card" class="visualizer-card" title="Click to cycle visualizer mode">
+        <div class="vis-header">
+          <span class="vis-title"><i data-icon="sliders" data-size="12"></i> Visualizer</span>
+          <span id="vis-mode-label" class="vis-mode">3D Terrain</span>
+        </div>
+        <div class="vis-canvas-container">
+          <canvas id="vis-canvas" width="180" height="84"></canvas>
+        </div>
+        <div class="vis-footer">
+          <span id="vis-status-text" class="vis-subtext">Volumetric Wireframe</span>
+        </div>
+      </div>
+      <div class="nav-rail-bottom">
+        <div class="storage-info" id="storage-text">
+          Free space: -- GB / -- GB
+        </div>
+        <button id="btn-settings" class="settings-gear" title="Settings"><i data-icon="settings" data-size="18"></i></button>
+      </div>
+    </aside>
+
+    <!-- Middle Pane - Sample List -->
+    <section class="sample-list-pane">
+      <div class="pane-header">
+        <h2 id="sample-list-title">All Samples</h2>
+        <span id="sample-count" class="count-badge">0</span>
+        <select id="sort-select" class="sort-select" title="Sort samples">
+          <option value="recent">Recent</option>
+          <option value="az">A–Z</option>
+          <option value="most">Most notes</option>
+          <option value="fav">Favorites first</option>
+        </select>
+      </div>
+      <div class="search-container">
+        <i data-icon="search" data-size="14" class="search-icon"></i>
+        <input id="search" class="search-input" placeholder="Search notes…" autocomplete="off" />
+      </div>
+      <div class="track-list" id="track-list">
+        <!-- List of LibraryTrack items -->
+      </div>
+    </section>
+
+    <!-- Detail Pane / Settings View -->
+    <main class="main-content-pane">
+      <!-- Detail Pane (Default View) -->
+      <div id="detail-view" class="content-view">
+        <!-- Empty State -->
+        <div id="detail-empty" class="empty-state">
+          <div class="empty-state-card">
+            <div class="empty-state-icon"><i data-icon="capture" data-size="34"></i></div>
+            <p class="empty-state-title">Nothing captured yet</p>
+            <p class="muted">Play a track in Spotify. After the phrase you want, click <strong>Capture</strong> in the Spotify playbar or here<span id="empty-shortcut" hidden> or press <kbd id="empty-hotkey"></kbd></span>. Drag the two edges to keep a phrase, name it, then add it to Playground. Enable the playbar button in Settings.</p>
+            <p id="empty-shortcut-status" class="muted" hidden></p>
+            <button id="btn-seed-empty" class="btn secondary" style="margin-top: 14px; display: none;"><i data-icon="music" data-size="14"></i> Load Demo Samples</button>
+          </div>
+          <!-- macOS capture-permission banner (Windows never sees it). -->
+          <div id="capture-permission-banner" class="empty-state-card" style="display: none;">
+            <p id="capture-permission-text">Samplify needs Screen Recording permission to capture audio.</p>
+            <p class="muted">Samplify captures system audio (the music playing in Spotify) — no video of your screen. macOS bundles audio-capture access under the Screen Recording permission.</p>
+            <button id="btn-open-screen-settings" class="btn primary">Open System Settings</button>
+          </div>
+        </div>
+
+        <!-- Detail Content -->
+        <div id="detail-content" class="detail-container" style="display: none;">
+          <header class="detail-header">
+            <div class="detail-header-left">
+              <h2 id="detail-track-title">—</h2>
+              <p id="detail-track-meta" class="track-meta">—</p>
+            </div>
+            <div class="detail-header-right">
+              <button id="fav-star" class="fav-star" title="Favorite this track"><i data-icon="star" data-size="20"></i></button>
+              <button id="track-delete" class="track-del" title="Delete this track and its clips"><i data-icon="trash" data-size="17"></i></button>
+            </div>
+          </header>
+
+          <!-- Waveform Block -->
+          <div class="waveform-container">
+            <div id="capture-strip" class="capture-strip" style="display: none;"></div>
+            <div class="waveform-wrapper">
+              <canvas id="waveform-canvas" width="600" height="120"></canvas>
+              <!-- Pin markers will be placed here dynamically -->
+              <div id="waveform-pins" class="pins-overlay"></div>
+              <div class="wave-toolbar">
+                <button id="wave-loop" class="wave-btn" title="Loop playback"><i data-icon="loop" data-size="12"></i> Loop</button>
+                <button id="wave-zoom-out" class="wave-btn" title="Zoom out"><i data-icon="zoomOut" data-size="12"></i></button>
+                <button id="wave-zoom-in" class="wave-btn" title="Zoom in"><i data-icon="zoomIn" data-size="12"></i></button>
+                <button id="wave-fit" class="wave-btn" title="Fit whole clip"><i data-icon="fit" data-size="12"></i> Fit</button>
+              </div>
+            </div>
+            <div class="timeline-labels">
+              <span id="timeline-start">0:00</span>
+              <span class="wave-hint">drag to select a loop · handles to resize · wheel to zoom · Loop to repeat</span>
+              <span id="timeline-end">0:00</span>
+            </div>
+            <div id="sel-bar" class="sel-bar" style="display: none;">
+              <span id="sel-bar-readout" class="sel-bar-readout tabular-nums">—</span>
+              <input id="sel-bar-note" class="sel-bar-note" placeholder="note for the new loop…" autocomplete="off" />
+              <button id="sel-bar-save-new" class="btn primary">Save as new note</button>
+              <button id="sel-bar-update" class="btn secondary">Update note</button>
+              <button id="sel-bar-revert" class="btn secondary">Revert</button>
+            </div>
+            <div id="waveform-placeholder" class="waveform-placeholder-msg" style="display: none;">
+              No audio captured for this session
+            </div>
+          </div>
+
+          <!-- Stem Mixer: the four stems of a split note, played in lock-step. -->
+          <section id="stem-mixer" class="stem-mixer" style="display: none;">
+            <div class="sm-head">
+              <div class="sm-title">
+                <span class="sm-kicker"><i data-icon="stems" data-size="13"></i> Stems</span>
+                <span id="sm-note" class="sm-note">—</span>
+                <span id="sm-pos" class="sm-pos tabular-nums">—</span>
+              </div>
+              <div id="sm-presets" class="sm-presets"></div>
+              <button id="sm-close" class="icon-btn" title="Close the mixer"><i data-icon="close" data-size="15"></i></button>
+            </div>
+            <div id="sm-lanes" class="sm-lanes"></div>
+            <div class="sm-transport">
+              <button id="sm-play" class="btn-play-pause sm-play" title="Play stems (Space)"><i data-icon="play" data-size="16"></i></button>
+              <button id="sm-loop" class="wave-btn" title="Loop"><i data-icon="loop" data-size="12"></i> Loop</button>
+              <span id="sm-time" class="sm-time tabular-nums">0:00.0 / 0:00.0</span>
+              <div id="sm-seek" class="sm-seek"><div class="sm-seek-track"><div id="sm-seek-fill" class="sm-seek-fill"></div></div><div id="sm-seek-knob" class="sm-seek-knob"></div></div>
+              <div class="sm-master" title="Monitor level (not baked into exports)">
+                <i data-icon="volume" data-size="14"></i>
+                <input id="sm-master" type="range" min="0" max="100" value="90" />
+              </div>
+              <div class="sm-actions">
+                <span id="sm-drag" class="note-drag sm-drag-mix" title="Drag this mix into your DAW"><i data-icon="grip" data-size="15"></i></span>
+                <button id="sm-save" class="btn secondary" title="Bounce the mix into the library as a new note">Save mix as note</button>
+                <button id="sm-export" class="btn export-btn" title="Bounce the mix to a WAV in Exports/">Export mix</button>
+                <button id="sm-delete" class="btn ghost sm-delete" title="Delete these four stem files">Delete stems</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Notes Section -->
+          <section class="notes-section">
+            <div class="notes-header">
+              <h3>Notes (<span id="note-count-title">0</span>)</h3>
+            </div>
+            <div class="notes-list" id="notes-list">
+              <!-- Note items -->
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- Settings View -->
+      <div id="settings-view" class="content-view" style="display: none;">
+        <h2>Settings</h2>
+        <div class="settings-form">
+          <div class="settings-group">
+            <label>Spotify In-App Integration</label>
+            <p class="settings-hint">Adds Capture and saved-note markers to the Spotify desktop playbar through Spicetify. Run setup again if a Spotify update removes the button.</p>
+            <button id="btn-spicetify" class="btn primary">Set up or repair Spotify</button>
+            <span id="spicetify-status" class="auth-status"></span>
+          </div>
+
+          <!-- macOS capture-permission section (hidden on Windows). -->
+          <div id="mac-capture-settings" class="settings-group" style="display: none;">
+            <label>System Audio Capture Permission</label>
+            <p class="settings-hint">macOS requires "Screen Recording" permission for an app to capture system audio. Samplify captures audio only — never your screen.</p>
+            <p id="mac-capture-status" class="auth-status">Checking…</p>
+            <button id="btn-open-screen-settings-2" class="btn primary">Open System Settings</button>
+          </div>
+
+          <div class="settings-group">
+            <label>Spotify Web API (optional)</label>
+            <p class="settings-hint">Provides track details when the playbar integration is unavailable.</p>
+            <div class="settings-inline">
+              <button id="connect" class="btn primary">Connect Spotify</button>
+              <span id="auth-state" class="auth-status">Not connected</span>
+            </div>
+            <details class="settings-advanced">
+              <summary>Advanced: custom Client ID</summary>
+              <input id="client-id" class="settings-input" placeholder="Spotify Client ID (leave blank to use the default)" />
+              <button id="save-cid" class="btn secondary">Save</button>
+            </details>
+          </div>
+
+          <div class="settings-group">
+            <label>Rolling Buffer</label>
+            <p class="settings-hint">How many seconds of audio stay available behind the playhead when you hit Capture.</p>
+            <div class="rolls-row">
+              <div class="roll-field" id="capture-source-field" hidden>
+                <label for="capture-source">App button and hotkey</label>
+                <select id="capture-source" class="settings-input">
+                  <option value="spotify">Spotify only</option>
+                  <option value="system">System audio (all apps)</option>
+                </select>
+              </div>
+              <div class="roll-field">
+                <label>Buffer Duration (s)</label>
+                <input id="buf-sec" type="number" min="30" max="300" class="settings-input small" />
+              </div>
+              <button id="save-buffer" class="btn primary">Save</button>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <label>Hotkey</label>
+            <div class="hotkeys-row">
+              <div class="hotkey-field">
+                <label>Capture Hotkey (click, then press the combination)</label>
+                <input id="hk-capture" type="text" class="settings-input hotkey-recorder" readonly placeholder="Click to record..." />
+              </div>
+              <button id="save-hotkeys" class="btn primary">Save Hotkey</button>
+            </div>
+            <p id="hotkeys-error" class="error-msg" style="display: none;"></p>
+            <p id="hotkey-status" class="settings-hint" hidden></p>
+          </div>
+
+          <div class="settings-group">
+            <label>Stem Separation</label>
+            <p class="settings-hint">Splits a note into drums, bass, other and vocals with the bundled htdemucs model, entirely on this machine. A split runs one at a time and takes a few seconds per clip.</p>
+            <div id="stem-model-status" class="model-status">Checking model…</div>
+          </div>
+
+          <div class="settings-group settings-footer">
+            <span id="app-version" class="settings-version">Samplify</span>
+            <button id="btn-seed" class="btn secondary" style="display: none;">Seed Developer Data</button>
+            <button id="btn-settings-back" class="btn ghost">← Back to Library</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tags View (Functional tags list) -->
+      <div id="tags-view" class="content-view" style="display: none;">
+        <h2>Tags</h2>
+        <p class="settings-hint">Click a tag to filter the library to the tracks that use it.</p>
+        <div class="tags-grid" id="tags-grid">
+          <!-- Seed tags list -->
+        </div>
+        <button id="btn-tags-back" class="btn ghost">← Back to Library</button>
+      </div>
+
+      <!-- Collections View -->
+      <div id="collections-view" class="content-view" style="display: none;">
+        <h2>Collections</h2>
+        <p class="settings-hint">Organize clips into folders (genres, BPM, ratings…). Grab a collection's handle to drag the whole sample pack into your DAW at once.</p>
+        <div class="new-collection-row">
+          <input id="new-collection-name" class="settings-input" placeholder="New collection (e.g. Hip-Hop, 5-star, Loops)" />
+          <button id="btn-new-collection" class="btn primary">Create</button>
+        </div>
+        <div id="collections-list" class="collections-list"></div>
+      </div>
+
+      <!-- Playground View (looping jam) -->
+      <div id="playground-view" class="content-view" style="display: none;">
+        <h2>Playground</h2>
+        <div class="pg-master">
+          <button id="pg-play" class="btn-play-pause" title="Play/stop the jam"><i data-icon="play" data-size="16"></i></button>
+          <div class="pg-master-bpm" title="Master tempo — synced lanes follow this">
+            <label for="pg-bpm">Tempo</label>
+            <input id="pg-bpm" type="range" min="60" max="180" value="120" />
+            <span id="pg-bpm-val" class="tabular-nums">120</span>
+          </div>
+          <button id="pg-import" class="btn secondary">Import audio</button>
+          <input type="file" id="pg-files" accept="audio/*,.wav,.aif,.aiff,.flac,.m4a,.mp3,.ogg" multiple hidden />
+          <button id="pg-clear" class="btn secondary">Clear all</button>
+        </div>
+        <div class="pg-arrange">
+          <label for="pg-name">Mix name</label>
+          <input id="pg-name" type="text" maxlength="120" placeholder="Untitled mix" />
+          <button id="pg-save" class="btn primary" disabled>Save 4-bar mix</button>
+          <button id="pg-export" class="btn secondary" hidden>Export saved WAV</button>
+          <output id="pg-status" aria-live="polite"></output>
+        </div>
+        <div id="playground-empty" class="empty-state-card">
+          <div class="empty-state-icon"><i data-icon="sliders" data-size="30"></i></div>
+          <p class="empty-state-title">No clips in the playground yet</p>
+          <p class="muted">Import a recording, or open the Library and click a note’s <i data-icon="grid" data-size="12"></i> button to add its clip as a lane. Lanes loop together — beat-synced when a tempo is detected.</p>
+        </div>
+        <div id="playground-lanes" class="pg-lanes"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Bottom Transport Bar -->
+  <footer class="transport-bar">
+    <div class="track-info">
+      <img id="tb-art" class="tb-thumb" src="" alt="" style="display: none;" />
+      <div class="tb-meta">
+        <div id="tb-title" class="tb-title">No track selected</div>
+        <div id="tb-artist" class="tb-artist">—</div>
+      </div>
+    </div>
+    <div class="transport-controls">
+      <button id="tb-play-pause" class="btn-play-pause" title="Play / pause"><i data-icon="play" data-size="16"></i></button>
+      <button id="tb-capture" class="btn-capture"><i data-icon="capture" data-size="15"></i> Capture</button>
+      <div class="time-readout">
+        <span id="tb-current-time" class="tabular-nums">0:00</span>
+        <span class="time-divider">/</span>
+        <span id="tb-duration" class="tabular-nums">0:00</span>
+      </div>
+    </div>
+    <div class="volume-and-actions">
+      <div class="tempo-control" title="Playback speed for auditioning (pitch preserved). Double-click to reset.">
+        <span class="tempo-icon"><i data-icon="speed" data-size="13"></i></span>
+        <input id="tb-tempo" type="range" min="50" max="150" value="100" class="tempo-slider" />
+        <span id="tb-tempo-val" class="tempo-val">1.00×</span>
+      </div>
+      <span class="vol-icon"><i data-icon="volume" data-size="15"></i></span>
+      <input id="tb-volume" type="range" min="0" max="100" value="100" class="volume-slider" />
+    </div>
+  </footer>
+
+  <!-- Stem split job card: live progress + cancel for the one running split. -->
+  <div id="stem-job" class="stem-job" style="display: none;">
+    <div class="stem-job-head">
+      <span class="stem-job-kicker"><i data-icon="stems" data-size="13"></i> Splitting stems</span>
+      <button id="stem-job-cancel" class="icon-btn" title="Cancel after the current chunk"><i data-icon="close" data-size="14"></i></button>
+    </div>
+    <div id="stem-job-title" class="stem-job-title">—</div>
+    <div class="stem-job-bar"><div id="stem-job-fill" class="stem-job-fill"></div></div>
+    <div id="stem-job-meta" class="stem-job-meta tabular-nums">Loading model…</div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Shared Audio Element -->
+  <audio id="clip-audio" style="display: none;"></audio>
+
+  <script type="module" src="js/library.js"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <!-- Resolve the real app's relative css/js paths to ../src/ -->
+  <base href="../src/" />
+  <!-- Install the Tauri mock BEFORE any app module runs (cache-busted) -->
+  <script>document.write('<scr' + 'ipt src="/preview/mock-tauri.js?v=' + Date.now() + '"><\/scr' + 'ipt>');</script>
+  <title>Samplify — Preview (Library)</title>
+</head>
+<body>
+  <script>
+    // Zero-drift harness: load the real src/library.html, inject its styles + body,
+    // then run its module script against the mocked __TAURI__.
+    (async () => {
+      try {
+        const bust = "?v=" + Date.now();
+        const txt = await (await fetch("library.html" + bust)).text();
+        const doc = new DOMParser().parseFromString(txt, "text/html");
+        doc.querySelectorAll('head link[rel="stylesheet"]').forEach((l) => {
+          const link = document.createElement("link");
+          link.rel = "stylesheet";
+          link.href = l.getAttribute("href") + bust;
+          document.head.appendChild(link);
+        });
+        const body = doc.body;
+        const scripts = [...body.querySelectorAll("script")];
+        scripts.forEach((s) => s.remove());
+        document.body.insertAdjacentHTML("afterbegin", body.innerHTML);
+        for (const s of scripts) {
+          const el = document.createElement("script");
+          if (s.type) el.type = s.type;
+          if (s.src) el.src = s.getAttribute("src") + bust;
+          else el.textContent = s.textContent;
+          document.body.appendChild(el);
+        }
+      } catch (e) {
+        document.body.innerHTML = '<pre style="color:#f88;font-family:monospace;padding:20px">preview loader failed: ' + e + "</pre>";
+      }
+    })();
+  </script>
+</body>
+</html>

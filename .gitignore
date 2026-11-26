@@ -1,0 +1,38 @@
+# Rust / Tauri
+/src-tauri/target/
+/src-tauri/gen/schemas/
+
+# Node
+/node_modules/
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Local agent & IDE scaffolding
+.agents/
+.claude/
+AGENTS.md
+
+# Internal design mock-ups
+Reference mock-ups/
+
+# Stem-separation model: fetched at build time by scripts/fetch-model.mjs.
+# 166 MB — exceeds GitHub's 100 MB hard limit, shipped via tauri bundle.resources.
+src-tauri/resources/
+
+*.log
+preview/*.png
+
+# Local recordings, installer candidates and editorial masters
+/private-releases/
+*.db
+*.db-wal
+*.db-shm
+.env
+.env.*
+!.env.example
+.DS_Store
+
+# Working design archive retained by maintainers
+/docs/superpowers/

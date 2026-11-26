@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <base href="../src/" />
+  <script src="/preview/mock-tauri.js"></script>
+  <title>Samplify — Preview (Capture Card)</title>
+  <style>
+    /* The capture card is a frameless transparent window; give the preview a
+       dark backdrop the same size so layout reads correctly. */
+    html, body { background: #05050a; height: 100%; }
+    body { display: flex; align-items: center; justify-content: center; }
+    #frame { width: 900px; height: 460px; }
+  </style>
+</head>
+<body>
+  <div id="frame"></div>
+  <script>
+    (async () => {
+      try {
+        const bust = "?v=" + Date.now();
+        const txt = await (await fetch("popup.html" + bust)).text();
+        const doc = new DOMParser().parseFromString(txt, "text/html");
+        doc.querySelectorAll('head link[rel="stylesheet"]').forEach((l) => {
+          const link = document.createElement("link");
+          link.rel = "stylesheet";
+          link.href = l.getAttribute("href") + bust;
+          document.head.appendChild(link);
+        });
+        const body = doc.body;
+        const scripts = [...body.querySelectorAll("script")];
+        scripts.forEach((s) => s.remove());
+        document.getElementById("frame").innerHTML = body.innerHTML;
+        for (const s of scripts) {
+          const el = document.createElement("script");
+          if (s.type) el.type = s.type;
+          if (s.src) el.src = s.getAttribute("src") + bust;
+          else el.textContent = s.textContent;
+          document.body.appendChild(el);
+        }
+      } catch (e) {
+        document.body.innerHTML = '<pre style="color:#f88;font-family:monospace;padding:20px">preview loader failed: ' + e + "</pre>";
+      }
+    })();
+  </script>
+</body>
+</html>

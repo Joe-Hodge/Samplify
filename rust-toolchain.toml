@@ -1,0 +1,4 @@
+# ort-sys 2.0.0-rc.12 stages its native DLLs using this Cargo build layout.
+[toolchain]
+channel = "1.94.1"
+profile = "minimal"

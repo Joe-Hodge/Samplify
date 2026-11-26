@@ -1,0 +1,63 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Samplify",
+  "version": "1.0.1",
+  "identifier": "com.samplify.app",
+  "build": {
+    "frontendDist": "../src"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "Samplify",
+        "width": 1450,
+        "height": 1000,
+        "minWidth": 1100,
+        "minHeight": 720,
+        "url": "library.html"
+      }
+    ],
+    "security": {
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": [
+          "$DOCUMENT/Samplify/Clips/**",
+          "**/Samplify/Clips/**"
+        ]
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "publisher": "Auromind Ltd",
+    "copyright": "© 2026 Auromind Ltd. All rights reserved.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico",
+      "icons/icon.icns"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "14.0",
+      "signingIdentity": null,
+      "entitlements": null
+    },
+    "windows": {
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "headerImage": "icons/nsis-header.bmp",
+        "sidebarImage": "icons/nsis-sidebar.bmp"
+      }
+    },
+    "resources": {
+      "resources/models/htdemucs_fp16weights.onnx": "resources/models/htdemucs_fp16weights.onnx",
+      "notices/": "notices/",
+      "../LICENSE": "notices/Samplify-LICENSE.txt"
+    }
+  }
+}
